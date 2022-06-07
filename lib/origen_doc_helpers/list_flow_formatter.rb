@@ -15,15 +15,19 @@ module OrigenDocHelpers
 
     def open_table
       str = ''
-      # str << "<table class=\"table table-striped\">"
+      str << "<table class=\"table table-striped\">"
       str << "<table class=\"table table-hover\">"
       str << '<thead><tr>'
-      str << '<th>Number</th>'
-      str << '<th>Result</th>'
-      str << '<th>Test</th>'
-      str << '<th>Pattern</th>'
+      str << '<th>ID</th>'
       str << '<th>Bin</th>'
-      str << '<th>Softbin</th>'
+      str << '<th>Number</th>'
+      str << '<th>Test Name</th>'
+      str << '<th>Test Pattern</th>'
+      str << '<th>Low Limit</th>'
+      str << '<th>High Limit</th>'
+      str << '<th>Force</th>'
+      str << '<th>VDDHV</th>'
+      str << '<th>VDDLV</th>'
       str << '</tr></thead>'
       str
     end
@@ -49,12 +53,18 @@ module OrigenDocHelpers
     def on_test(node)
       id = node.find(:id).value
       html << "<tr id=\"list_#{@flow}_test_#{id}\" class=\"list-test-line clickable\" data-testid=\"flow_#{@flow}_test_#{id}\">"
-      html << "<td>#{node.find(:number).try(:value)}</td>"
-      if node.find(:failed)
-        html << '<td>FAIL</td>'
+      # sequence id
+      sequence = node.find(:id).value.gsub('t','').to_i
+      html << "<td>#{sequence}</td>"
+      # hard bin
+      if (f1 = node.find(:on_fail)) && (r1 = f1.find(:set_result)) && (b1 = r1.find(:bin))
+        html << "<td>#{b1.value}</td>"
       else
-        html << '<td>PASS</td>'
+        html << '<td></td>'
       end
+      # test number
+      html << "<td>#{node.find(:number).try(:value)}</td>"
+      # test name
       if n = node.find(:name)
         name = n.value
       else
@@ -62,19 +72,33 @@ module OrigenDocHelpers
       end
       html << "<td>#{name}</td>"
       html << "<td>#{node.find(:object).value['Pattern']}</td>"
-
-      if (f1 = node.find(:on_fail)) && (r1 = f1.find(:set_result)) && (b1 = r1.find(:bin))
-        html << "<td>B#{b1.value}</td>"
-      else
+      vddhv = node.value.fetch('Vddhv').to_s.upcase
+      vddlv = node.value.fetch('Vddlv').to_s.upcase
+      # if no limits found in node
+      if node.find_all(:limit).nil? || node.find_all(:limit).empty?
         html << '<td></td>'
-      end
-
-      if (f2 = node.find(:on_fail)) && (r2 = f2.find(:set_result)) && (b2 = r2.find(:softbin))
-        html << "<td>S#{b2.value}</td>"
-      else
         html << '<td></td>'
+        html << '<td></td>'   
+      else # found parametric limits in node
+        para_limits = node.find_all(:limit)
+        u_limit = ''
+        l_limit = ''
+        para_limits[0..1].each do |limit|
+          if limit.inspect.include?('gte')
+            l_limit = '%.4g' % limit.value
+          elsif limit.inspect.include?('lte')
+            u_limit = '%.4g' % limit.value
+          else
+            raise 'Cannot idenfity if the value of limit is for upper or lower limit'
+          end
+        end
+        force_val = node.find_all(:force_value).first.value.round(3) # assume 1 force value for now
+        html << "<td>#{l_limit}</td>"
+        html << "<td>#{u_limit}</td>"
+        html << "<td>#{force_val}</td>"
       end
-
+      html << "<td>#{vddhv}</td>"
+      html << "<td>#{vddlv}</td>"      
       html << '</tr>'
     end
 
