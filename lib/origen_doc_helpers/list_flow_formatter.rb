@@ -78,8 +78,8 @@ module OrigenDocHelpers
       else
         name = node.find(:object).value['Test']
       end
-      html << "<td width=\"25%\" style=\"word-break: break-word\">#{name}</td>"
-      html << "<td width=\"15%\" style=\"word-break: break-word\">#{node.find(:object).value['Pattern']}</td>"
+      html << "<td width=\"35%\" style=\"word-break: break-word\">#{name}</td>"
+      html << "<td width=\"20%\" style=\"word-break: break-word\">#{node.find(:object).value['Pattern']}</td>"
       vddhv = node.value.fetch('Vddhv').to_s.upcase
       vddlv = node.value.fetch('Vddlv').to_s.upcase
       # if no limits found in node
@@ -108,7 +108,7 @@ module OrigenDocHelpers
       html << "<td>#{vddhv}</td>"
       html << "<td>#{vddlv}</td>"   
       if node.description
-        html << "<td width=\"25%\" style=\"word-break: break-word\">#{node.description.join("\n")}</td>" 
+        html << "<td width=\"35%\" style=\"word-break: break-word\">#{node.description.join("\n")}</td>" 
       else
         html << '<td></td>' 
       end
