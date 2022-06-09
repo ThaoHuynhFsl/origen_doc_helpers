@@ -15,11 +15,12 @@ module OrigenDocHelpers
 
     def open_table
       str = ''
-      str << "<table class=\"table table-striped\">"
-      str << "<table class=\"table table-hover\">"
+      str << "<table class=\"table table-striped\" style=\"table-layout: fixed; width: 100%\">"
+      str << "<table class=\"table table-bordered\">"
       str << '<thead><tr>'
       str << '<th>ID</th>'
-      str << '<th>Bin</th>'
+      str << '<th>HBin</th>'
+      str << '<th>SBin</th>'
       str << '<th>Number</th>'
       str << '<th>Test Name</th>'
       str << '<th>Test Pattern</th>'
@@ -28,6 +29,7 @@ module OrigenDocHelpers
       str << '<th>Force</th>'
       str << '<th>VDDHV</th>'
       str << '<th>VDDLV</th>'
+      str << '<th>Description</th>'
       str << '</tr></thead>'
       str
     end
@@ -62,6 +64,12 @@ module OrigenDocHelpers
       else
         html << '<td></td>'
       end
+      # soft bin
+      if (f1 = node.find(:on_fail)) && (r1 = f1.find(:set_result)) && (b1 = r1.find(:softbin))
+        html << "<td>#{b1.value}</td>"
+      else
+        html << '<td></td>'
+      end
       # test number
       html << "<td>#{node.find(:number).try(:value)}</td>"
       # test name
@@ -70,8 +78,8 @@ module OrigenDocHelpers
       else
         name = node.find(:object).value['Test']
       end
-      html << "<td>#{name}</td>"
-      html << "<td>#{node.find(:object).value['Pattern']}</td>"
+      html << "<td width=\"60%\" style=\"word-break: break-word\">#{name}</td>"
+      html << "<td width=\"30%\" style=\"word-break: break-word\">#{node.find(:object).value['Pattern']}</td>"
       vddhv = node.value.fetch('Vddhv').to_s.upcase
       vddlv = node.value.fetch('Vddlv').to_s.upcase
       # if no limits found in node
@@ -93,12 +101,17 @@ module OrigenDocHelpers
           end
         end
         force_val = node.find_all(:force_value).first.value.round(3) # assume 1 force value for now
-        html << "<td>#{l_limit}</td>"
-        html << "<td>#{u_limit}</td>"
+        html << "<td>#{l_limit.to_s << node.find_all(:units).first.value}</td>"
+        html << "<td>#{u_limit.to_s << node.find_all(:units).first.value}</td>"
         html << "<td>#{force_val}</td>"
       end
       html << "<td>#{vddhv}</td>"
-      html << "<td>#{vddlv}</td>"      
+      html << "<td>#{vddlv}</td>"   
+      if node.description
+        html << "<td class=\"cell-breakWord\">#{node.description.join("\n")}</td>" 
+      else
+        html << '<td></td>' 
+      end
       html << '</tr>'
     end
 
