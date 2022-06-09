@@ -108,7 +108,7 @@ module OrigenDocHelpers
       html << "<td>#{vddhv}</td>"
       html << "<td>#{vddlv}</td>"   
       if node.description
-        html << "<td width=\"15%\" style=\"word-break: break-word\">#{node.description.join("\n")}</td>" 
+        html << "<td width=\"25%\" style=\"word-break: break-word\">#{node.description.join("\n")}</td>" 
       else
         html << '<td></td>' 
       end
