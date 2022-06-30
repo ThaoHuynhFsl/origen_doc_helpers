@@ -28,22 +28,23 @@ module OrigenDocHelpers
       #else
       #  str << headers_and_attributes
       #end
-
       str << "<table class=\"table table-striped\" style=\"table-layout: fixed; width: 100%\">"
       str << "<table class=\"table table-bordered\">"
-      str << '<thead><tr>'
-      str << '<th>ID</th>'
+      str << "<caption style=\"text-align:left\">Target: #{Origen.target.name}, Application Version: #{Origen.app.version}</caption>"
+      str << "<thead><tr>"
       str << '<th>HBin</th>'
       str << '<th>SBin</th>'
       str << '<th>Number</th>'
       str << '<th>Test Name</th>'
-      str << '<th>Test Pattern</th>'
+#      str << '<th>Test Pattern</th>'
       str << '<th>Low Limit</th>'
       str << '<th>High Limit</th>'
       str << '<th>Force</th>'
       str << '<th>VDDHV</th>'
       str << '<th>VDDLV</th>'
       str << '<th>Description</th>'
+      str << '<th>Test Name in Datalog</th>'
+      str << '<th>Custom Info</th>'
       str << '</tr></thead>'
       str
     end
@@ -59,7 +60,7 @@ module OrigenDocHelpers
     end
 
     def on_log(node)
-      html << "<tr><td colspan=\"6\"><strong>LOG: </strong> #{node.value}</td></tr>"
+      # html << "<tr><td colspan=\"6\"><strong>LOG: </strong> #{node.value}</td></tr>"
     end
 
     def on_render(node)
@@ -69,9 +70,6 @@ module OrigenDocHelpers
     def on_test(node, body_and_attributes: :default)
       id = node.find(:id).value
       html << "<tr id=\"list_#{@flow}_test_#{id}\" class=\"list-test-line clickable\" data-testid=\"flow_#{@flow}_test_#{id}\">"
-      # sequence id
-      sequence = node.find(:id).value.gsub('t','').to_i
-      html << "<td>#{sequence}</td>"
       # hard bin
       if (f1 = node.find(:on_fail)) && (r1 = f1.find(:set_result)) && (b1 = r1.find(:bin))
         html << "<td>#{b1.value}</td>"
@@ -92,8 +90,9 @@ module OrigenDocHelpers
       else
         name = node.find(:object).value['Test']
       end
-      html << "<td width=\"35%\" style=\"word-break: break-word\">#{name}</td>"
-      html << "<td width=\"20%\" style=\"word-break: break-word\">#{node.find(:object).value['Pattern']}</td>"
+      html << "<td width=\"23%\" style=\"word-break: break-word\">#{name}</td>"
+      # pattern
+      # html << "<td width=\"17%\" style=\"word-break: break-word\">#{node.find(:object).value['Pattern']}</td>"
       # if no limits found in node
       if node.find_all(:limit).nil? || node.find_all(:limit).empty?
         html << '<td></td>'
@@ -119,7 +118,7 @@ module OrigenDocHelpers
           l_limit_units = node.find_all(:units).first.value 
         end
         html << "<td>#{l_limit.to_s << l_limit_units}</td>" 
-        html << "<td>#{u_limit.to_s << l_limit_units}</td>" 
+        html << "<td>#{u_limit.to_s << l_limit_units}</td>"
       end
 
       # force value
@@ -147,6 +146,9 @@ module OrigenDocHelpers
       else
         html << '<td></td>' 
       end
+      nxp_test_name = node.find(:object).value['Test']
+      html << "<td width=\"30%\" style=\"word-break: break-word\">#{nxp_test_name}</td>"
+      html << "<td></td>"
       html << '</tr>'
     end
 
