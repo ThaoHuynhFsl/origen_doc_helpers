@@ -104,12 +104,14 @@ module OrigenDocHelpers
         l_limit = ''
         l_limit_units = ''
         para_limits[0..1].each do |limit|
+          unless limit.value == "na"
           if limit.inspect.include?('gte')
             l_limit = '%.4g' % limit.value
           elsif limit.inspect.include?('lte')
             u_limit = '%.4g' % limit.value
           else
             raise 'Cannot idenfity if the value of limit is for upper or lower limit'
+          end
           end
         end
 
@@ -129,8 +131,8 @@ module OrigenDocHelpers
       # vddhv and vddlv
       vddhv = ''
       vddlv = ''
-      if node.find(:object).value.include?('Vdio')
-        vddhv = node.value.fetch('Vdio').to_s.upcase
+      if node.find(:object).value.include?('Vdio') || node.find(:object).value.include?('Vddio')
+        vddhv = node.value.fetch('Vdio').to_s.upcase || node.value.fetch('Vddio').to_s.upcase
       else
         vddhv = node.value.fetch('Vddhv').to_s.upcase
       end
