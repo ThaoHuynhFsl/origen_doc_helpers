@@ -13,23 +13,12 @@ module OrigenDocHelpers
       html
     end
 
-    def open_table(headers_and_attributes: :default)
+    def open_table
       str = ''
-      # if headers_and_attributes == :default
-      #  str << "<table class=\"table table-hover\">"
-      #  str << '<thead><tr>'
-      #  str << '<th>Number</th>'
-      #  str << '<th>Result</th>'
-      #  str << '<th>Test</th>'
-      #  str << '<th>Pattern</th>'
-      #  str << '<th>Bin</th>'
-      #  str << '<th>Softbin</th>'
-      #  str << '</tr></thead>'
-      # else
-      #  str << headers_and_attributes
-      # end
-      str << "<table class=\"table table-striped\" style=\"table-layout: fixed; width: 100%\">"
-      str << "<table class=\"table table-bordered\">"
+      # str << "<table class=\"table table-striped\">"
+      # str << "<table class=\"table table-hover\">"
+      # str << "<table class=\"table table-striped\" style=\"table-layout: fixed; width: 100%\">"
+      str << "<table class=\"table table-bordered\" style=\"table-layout: fixed; width: 450%\">"
       str << "<caption style=\"text-align:left\">Target: #{Origen.target.name}, Application Version: #{Origen.app.version}</caption>"
       str << '<thead><tr>'
       str << '<th>HBin</th>'
@@ -46,6 +35,7 @@ module OrigenDocHelpers
       str << '<th>Test Name in Datalog</th>'
       str << '<th>Custom Info</th>'
       str << '</tr></thead>'
+
       str
     end
 
