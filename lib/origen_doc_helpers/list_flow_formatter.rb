@@ -15,7 +15,7 @@ module OrigenDocHelpers
 
     def open_table(headers_and_attributes: :default)
       str = ''
-      #if headers_and_attributes == :default
+      # if headers_and_attributes == :default
       #  str << "<table class=\"table table-hover\">"
       #  str << '<thead><tr>'
       #  str << '<th>Number</th>'
@@ -25,18 +25,18 @@ module OrigenDocHelpers
       #  str << '<th>Bin</th>'
       #  str << '<th>Softbin</th>'
       #  str << '</tr></thead>'
-      #else
+      # else
       #  str << headers_and_attributes
-      #end
+      # end
       str << "<table class=\"table table-striped\" style=\"table-layout: fixed; width: 100%\">"
       str << "<table class=\"table table-bordered\">"
       str << "<caption style=\"text-align:left\">Target: #{Origen.target.name}, Application Version: #{Origen.app.version}</caption>"
-      str << "<thead><tr>"
+      str << '<thead><tr>'
       str << '<th>HBin</th>'
       str << '<th>SBin</th>'
       str << '<th>Number</th>'
       str << '<th>Test Name</th>'
-#      str << '<th>Test Pattern</th>'
+      #      str << '<th>Test Pattern</th>'
       str << '<th>Low Limit</th>'
       str << '<th>High Limit</th>'
       str << '<th>Force</th>'
@@ -60,14 +60,14 @@ module OrigenDocHelpers
     end
 
     def on_log(node)
-      # html << "<tr><td colspan=\"6\"><strong>LOG: </strong> #{node.value}</td></tr>"
+      html << "<tr><td colspan=\"6\"><strong>LOG: </strong> #{node.value}</td></tr>"
     end
 
     def on_render(node)
       html << "<tr><td colspan=\"6\"><strong>RENDER: </strong> An expicitly rendered flow snippet occurs here</td></tr>"
     end
 
-    def on_test(node, body_and_attributes: :default)
+    def on_test(node) # , body_and_attributes: :default)
       id = node.find(:id).value
       html << "<tr id=\"list_#{@flow}_test_#{id}\" class=\"list-test-line clickable\" data-testid=\"flow_#{@flow}_test_#{id}\">"
       # hard bin
@@ -96,7 +96,7 @@ module OrigenDocHelpers
       # if no limits found in node
       if node.find_all(:limit).nil? || node.find_all(:limit).empty?
         html << '<td></td>'
-        html << '<td></td>' 
+        html << '<td></td>'
       else # found parametric limits in node
         para_limits = node.find_all(:limit)
         u_limit = ''
@@ -104,28 +104,28 @@ module OrigenDocHelpers
         l_limit = ''
         l_limit_units = ''
         para_limits[0..1].each do |limit|
-          unless limit.value == "na"
-          if limit.inspect.include?('gte')
-            l_limit = '%.4g' % limit.value
-          elsif limit.inspect.include?('lte')
-            u_limit = '%.4g' % limit.value
-          else
-            raise 'Cannot idenfity if the value of limit is for upper or lower limit'
-          end
+          unless limit.value == 'na'
+            if limit.inspect.include?('gte')
+              l_limit = '%.4g' % limit.value
+            elsif limit.inspect.include?('lte')
+              u_limit = '%.4g' % limit.value
+            else
+              fail 'Cannot idenfity if the value of limit is for upper or lower limit'
+            end
           end
         end
 
-        if !node.find_all(:units).empty?
-          u_limit_units = node.find_all(:units).first.value 
-          l_limit_units = node.find_all(:units).first.value 
+        unless node.find_all(:units).empty?
+          u_limit_units = node.find(:units).value
+          l_limit_units = node.find(:units).value
         end
-        html << "<td>#{l_limit.to_s << l_limit_units}</td>" 
+        html << "<td>#{l_limit.to_s << l_limit_units}</td>"
         html << "<td>#{u_limit.to_s << l_limit_units}</td>"
       end
 
       # force value
       force_val = ''
-      force_val = node.find_all(:force_value).first.value.round(3) if !node.find_all(:force_value).empty? # assume 1 force value for now
+      force_val = node.find(:force_value).value.round(3) unless node.find_all(:force_value).empty? # assume 1 force value for now
       html << "<td>#{force_val}</td>"
 
       # vddhv and vddlv
@@ -142,15 +142,19 @@ module OrigenDocHelpers
         vddlv = node.value.fetch('Vddlv').to_s.upcase
       end
       html << "<td>#{vddhv}</td>"
-      html << "<td>#{vddlv}</td>"  
+      html << "<td>#{vddlv}</td>"
       if node.description
-        html << "<td width=\"35%\" style=\"word-break: break-word\">#{node.description.join("\n")}</td>" 
+        html << "<td width=\"35%\" style=\"word-break: break-word\">#{node.description.join("\n")}</td>"
       else
-        html << '<td></td>' 
+        html << '<td></td>'
       end
       nxp_test_name = node.find(:object).value['Test']
       html << "<td width=\"30%\" style=\"word-break: break-word\">#{nxp_test_name}</td>"
-      html << "<td></td>"
+      # custom info
+      custom_info = ''
+      custom_info = node.find(:custom_op).value unless node.find_all(:custom_op).empty? # assume 1 force value for now
+      html << "<td>#{custom_info}</td>"
+
       html << '</tr>'
     end
 
